@@ -6,6 +6,7 @@ import wind_direction_byo
 import statistics
 import ds18b20_therm
 import database
+import socket
 
 wind_count = 0  # Counts how many half-rotations
 radius_cm = 9.0  # Radius of your anemometer
@@ -60,7 +61,18 @@ wind_speed_sensor = Button(5)
 wind_speed_sensor.when_pressed = spin
 rain_sensor = Button(6)
 rain_sensor.when_pressed = bucket_tipped
-temp_probe = ds18b20_therm.DS18B20()
+# temp_probe = ds18b20_therm.DS18B20()
+
+
+# For use when ground temp probe is connected to another device
+# See: https://gist.github.com/stmio/658f5dd1a6b3d24d7b4ecf526f68ce21
+def get_ground_temp(ip="192.168.1.155", port=42800):
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.connect((ip, port))
+    data = sock.recv(1024).decode()
+    sock.close()
+    return data
+
 
 db = database.weather_database()
 
@@ -82,7 +94,8 @@ while True:
     reset_rainfall()
     store_speeds = []
     store_directions = []
-    ground_temp = temp_probe.read_temp()
+    # ground_temp = temp_probe.read_temp()
+    ground_temp = get_ground_temp()
     humidity, pressure, ambient_temp = bme688_sensor.read_all()
 
     db.insert(
