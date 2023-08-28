@@ -96,7 +96,7 @@ while True:
     store_directions = []
     # ground_temp = temp_probe.read_temp()
     ground_temp = get_ground_temp()
-    humidity, pressure, ambient_temp = bme688_sensor.read_all()
+    ambient_temp, pressure, humidity = bme688_sensor.read_all()
 
     db.insert(
         ambient_temp,
